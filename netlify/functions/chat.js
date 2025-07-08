@@ -8,9 +8,18 @@ const openai = new OpenAIApi(configuration);
 
 exports.handler = async function(event) {
   try {
-    const body = JSON.parse(event.body);
-    const userMessage = body.message;
+    // Make sure the body exists and is valid
+    const body = JSON.parse(event.body || "{}");
+    const userMessage = body.message || "";
 
+    if (!userMessage) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "No message provided" }),
+      };
+    }
+
+    // Call OpenAI API
     const response = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
       messages: [{ role: "user", content: userMessage }],
@@ -23,6 +32,7 @@ exports.handler = async function(event) {
       body: JSON.stringify({ reply }),
     };
   } catch (error) {
+    console.error("Server Error:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: error.message }),

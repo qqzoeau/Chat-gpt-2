@@ -1,0 +1,7 @@
+{
+  "name": "chat-backend",
+  "version": "1.0.0",
+  "dependencies": {
+    "openai": "^4.26.0"
+  }
+}

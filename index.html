@@ -1,35 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Zoe's ChatGPT</title>
-  <style>
-    body { font-family: Arial; background: #f7f7f7; padding: 20px; }
-    #chatbox { background: white; border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: scroll; margin-bottom: 10px; }
-    input, button { padding: 10px; width: 100%; margin-top: 5px; font-size: 16px; }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Zoe GPT</title>
 </head>
 <body>
-  <h2>Ask Zoe’s ChatGPT 🤖</h2>
-  <div id="chatbox"></div>
-  <input type="text" id="userInput" placeholder="Type your question..." />
+  <h1>Ask Zoe-GPT</h1>
+  <input id="message" type="text" placeholder="Ask me anything..." />
   <button onclick="sendMessage()">Send</button>
+  <p id="response"></p>
 
   <script>
     async function sendMessage() {
-      const input = document.getElementById("userInput").value;
-      const chatbox = document.getElementById("chatbox");
-      chatbox.innerHTML += `<p><b>You:</b> ${input}</p>`;
-      document.getElementById("userInput").value = "";
+      const input = document.getElementById("message");
+      const responseBox = document.getElementById("response");
 
-      const response = await fetch("/.netlify/functions/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: input })
-      });
+      const userMessage = input.value;
+      responseBox.innerText = "Thinking...";
 
-      const data = await response.json();
-      chatbox.innerHTML += `<p><b>Bot:</b> ${data.reply}</p>`;
-      chatbox.scrollTop = chatbox.scrollHeight;
+      try {
+        const res = await fetch("/.netlify/functions/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: userMessage }),
+        });
+
+        const data = await res.json();
+        responseBox.innerText = data.reply || "No reply received.";
+      } catch (err) {
+        responseBox.innerText = "Error: " + err.message;
+      }
     }
   </script>
 </body>

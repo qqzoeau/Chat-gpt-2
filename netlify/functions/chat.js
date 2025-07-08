@@ -8,14 +8,19 @@ const openai = new OpenAIApi(configuration);
 
 exports.handler = async function(event) {
   try {
-    const data = JSON.parse(event.body);
+    const body = JSON.parse(event.body);
+    const userMessage = body.message;
+
     const response = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: data.message }],
+      messages: [{ role: "user", content: userMessage }],
     });
+
+    const reply = response.data.choices[0].message.content;
+
     return {
       statusCode: 200,
-      body: JSON.stringify({ reply: response.data.choices[0].message.content }),
+      body: JSON.stringify({ reply }),
     };
   } catch (error) {
     return {

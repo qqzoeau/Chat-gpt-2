@@ -1,37 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Zoe GPT</title>
+  <title>Chat with GPT</title>
 </head>
 <body>
-  <h1>Ask Zoe-GPT</h1>
-  <input id="message" type="text" placeholder="Ask me anything..." />
-  <button onclick="sendMessage()">Send</button>
-  <p id="response"></p>
+  <h1>Chat GPT</h1>
+  <textarea id="chatBox" rows="10" cols="50" readonly></textarea><br>
+  <input type="text" id="inputBox" placeholder="Type your question" />
+  <button id="sendBtn">Send</button>
 
   <script>
-    async function sendMessage() {
-      const input = document.getElementById("message");
-      const responseBox = document.getElementById("response");
-
-      const userMessage = input.value;
-      responseBox.innerText = "Thinking...";
-
-      try {
-        const res = await fetch("/.netlify/functions/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: userMessage }),
-        });
-
-        const data = await res.json();
-        responseBox.innerText = data.reply || "No reply received.";
-      } catch (err) {
-        responseBox.innerText = "Error: " + err.message;
-      }
+    async function sendMessage(message) {
+      const response = await fetch('/.netlify/functions/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+      });
+      const data = await response.json();
+      return data.reply;
     }
+
+    document.getElementById("sendBtn").onclick = async () => {
+      const input = document.getElementById("inputBox").value;
+      if (!input) return;
+      const reply = await sendMessage(input);
+      document.getElementById("chatBox").value += "You: " + input + "\n";
+      document.getElementById("chatBox").value += "Bot: " + reply + "\n\n";
+      document.getElementById("inputBox").value = "";
+    };
   </script>
 </body>
 </html>
